@@ -8,12 +8,13 @@ module Hadooken
 
       def run(index)
         @index = index
+        @consumer_lookup = {}
 
         Thread.new { handle_signals }
 
         subscription.each_message do |message|
-          Kafka::Util.put_log("New message #{message.offset}", :debug)
-          pool.post { Questionnaire::MessageConsumer.perform(message.value) }
+          Util.put_log("New message #{message.offset}", :debug)
+          pool.post { dispatch(message) }
         end
       rescue => e
         Util.capture_error(e)
@@ -26,6 +27,17 @@ module Hadooken
                                                        max_threads: Hadooken.configuration.threads,
                                                        max_queue:   -1,
                                                        fallback_policy: :caller_runs)
+        end
+
+        def consumer_of(topic)
+          @consumer_lookup[topic] ||= Hadooken.configuration.topics[topic.to_sym].constantize
+        end
+
+        def dispatch(message)
+          consumer_of(message.topic).perform(message.value)
+        rescue => e
+          Util.capture_error(e)
+          Util.put_log(e.message, :fatal)
         end
 
         def kafka
