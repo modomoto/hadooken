@@ -33,11 +33,17 @@ module Hadooken
       validate!
     end
 
-    # Defines getter methods for all valid configuration keys
-    # which fallbacks the default values defined in hash.
+    # Defines getter & setter methods for
+    # all valid configuration keys
+    # which fallbacks the default
+    # values defined in hash.
     VALID_CONFIG_OPTIONS.each do |option, value|
       define_method(option) do
         options[option] || value
+      end
+
+      define_method("#{option}=") do |config|
+        options[option] = config
       end
     end
 
