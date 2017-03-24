@@ -6,7 +6,7 @@ module Hadooken
         Process.daemon(true, true) if Hadooken.configuration.daemon
         require_env
 
-        Util.put_log("Running KafkaDaemon")
+        Util.put_log("Running Hadooken(because hadouken is taken :|)")
         Thread.abort_on_exception = true
 
         pids = []
