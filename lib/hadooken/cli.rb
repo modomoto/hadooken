@@ -31,7 +31,7 @@ module Hadooken
           # Which means we want to require an environment
           # other than rails.
           if Hadooken.configuration.require_env
-
+            require File.expand_path(Hadooken.configuration.require_env)
           else
             require 'rails'
 
