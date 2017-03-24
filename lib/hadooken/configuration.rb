@@ -46,8 +46,8 @@ module Hadooken
         @parser = OptionParser.new do |o|
           o.banner = "Usage: bundle exec hadooken [options]"
 
-          o.on "-d", "--daemon", "Daemonize process" do |arg|
-            options[:daemon] = arg
+          o.on "-d", "--daemon", "Daemonize process" do
+            options[:daemon] = true
           end
 
           o.on "-e", "--environment ENV", "Application environment" do |arg|
@@ -82,7 +82,7 @@ module Hadooken
         end
 
         configs = YAML.load_file(options[:config_file]).deep_symbolize_keys
-        options.merge!(configs[environment])
+        options.reverse_merge!(configs[environment])
       end
 
       def validate!

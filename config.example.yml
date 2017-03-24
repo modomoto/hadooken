@@ -1,6 +1,6 @@
 development:
   daemon: false
-  logfile: tmp/development.logfile
+  logfile: tmp/development.log
   pidfile: tmp/hadooken.pid
   workers: 2
   threads: 16

@@ -23,7 +23,7 @@ module Hadooken
       end
 
       def logger
-        @logger ||= Logger.new(STDOUT)
+        @logger ||= Logger.new(Hadooken.configuration.logfile || STDOUT)
       end
 
       private
