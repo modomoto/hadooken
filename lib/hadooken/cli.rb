@@ -34,17 +34,20 @@ module Hadooken
         # If the `require_env` is not specified than it tries to
         # require rails by default.
         def require_env
-          return false
+          ENV['RACK_ENV'] = ENV['RAILS_ENV'] = Hadooken.configuration.environment.to_s
 
           # Which means we want to require an environment
           # other than rails.
           if Hadooken.configuration.require_env
             require File.expand_path(Hadooken.configuration.require_env)
           else
-            require 'rails'
+            require "rails"
 
             if ::Rails::VERSION::MAJOR == 4
               require File.expand_path("config/application.rb")
+              ::Rails::Application.initializer "hadooken.eager_load" do
+                ::Rails.application.config.eager_load = true
+              end
               require File.expand_path("config/environment.rb")
             else
               require File.expand_path("config/environment.rb")
