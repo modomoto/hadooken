@@ -30,7 +30,6 @@ module Hadooken
       @options.merge(parser.getopts)
       @options[:config_file] ||= DEFAULT_CONFIG_FILE if File.exist?(DEFAULT_CONFIG_FILE)
       parse_config_file if @options[:config_file]
-      validate!
     end
 
     # Defines getter & setter methods for
@@ -44,6 +43,14 @@ module Hadooken
 
       define_method("#{option}=") do |config|
         options[option] = config
+      end
+    end
+
+    def validate!
+      if options[:daemon] && !(options[:logfile] && options[:pidfile])
+        puts "Can not be deamonized without logfile and pidfile options"
+        puts parser.on_tail "-h"
+        exit 1
       end
     end
 
@@ -89,14 +96,6 @@ module Hadooken
 
         configs = YAML.load_file(options[:config_file]).deep_symbolize_keys
         options.reverse_merge!(configs[environment])
-      end
-
-      def validate!
-        if options[:daemon] && !(options[:logfile] && options[:pidfile])
-          puts "Can not be deamonized without logfile and pidfile options"
-          puts parser.on_tail "-h"
-          exit 1
-        end
       end
 
   end

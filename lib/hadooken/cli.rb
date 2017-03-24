@@ -3,6 +3,8 @@ module Hadooken
 
     class << self
       def run
+        require_env
+        Hadooken.configuration.validate!
         puts "Running Hadooken(because hadouken is taken :|)"
 
         if Hadooken.configuration.daemon
@@ -11,7 +13,6 @@ module Hadooken
           Process.daemon(true, true)
         end
 
-        require_env
         Thread.abort_on_exception = true
 
         pids = [Process.pid]
