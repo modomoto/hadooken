@@ -23,7 +23,11 @@ module Hadooken
         end
 
         fill_pid_file(pids) if Hadooken.configuration.daemon
-        at_exit { remove_pid_file }
+
+        at_exit do
+          Util.put_log("Bye bye.")
+          remove_pid_file
+        end
 
         Util.put_log("Running master worker")
         Worker.run(-1)
