@@ -57,14 +57,19 @@ module Hadooken
         # first one for handling signals for gracefull shutdown
         # second one for sending heartbeat messages to topic.
         def setup_helper_threads
-          timer_options = {
-            execution_interval: Hadooken.configuration.heartbeat[:frequency],
-            timeout_interval:   5
-          }
-
-          timer = Concurrent::TimerTask.new(timer_options) { send_heartbeat_message }
-          timer.execute
+          heartbeat_timer.execute
           Thread.new { handle_signals }
+        end
+
+        def heartbeat_timer
+          @heartbeat_timer ||= begin
+            timer_options = {
+              execution_interval: Hadooken.configuration.heartbeat[:frequency],
+              timeout_interval:   5
+            }
+
+            Concurrent::TimerTask.new(timer_options) { send_heartbeat_message }
+          end
         end
 
         def send_heartbeat_message
@@ -107,6 +112,7 @@ module Hadooken
             identity = index == -1 ? "master" : "#{index}. worker"
             Util.put_log("#{identity} is shutting down")
             subscription.stop
+            heartbeat_timer.shutdown
             pool.shutdown
             reader.close
           end
