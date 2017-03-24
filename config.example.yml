@@ -1,0 +1,11 @@
+development:
+  daemon: false
+  logfile: tmp/development.logfile
+  pidfile: tmp/hadooken.pid
+  workers: 2
+  threads: 16
+  topics:
+    sample: ClassName
+  kafka:
+    brokers:
+      - localhost:9092

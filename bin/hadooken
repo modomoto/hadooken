@@ -1,0 +1,7 @@
+#!/usr/bin/env ruby
+
+$TESTING = false
+
+require_relative '../lib/hadooken'
+
+Hadooken::CLI.run
