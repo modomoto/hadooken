@@ -16,7 +16,8 @@ module Hadooken
       threads:     16,
       topics:      {},
       kafka:       Hash.new({}),
-      require_env: nil
+      require_env: nil,
+      heartbeat:   { topic: :consumer_heartbeat, frequency: 5 }
     }.freeze
 
     attr_accessor :error_capturer

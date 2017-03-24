@@ -9,8 +9,7 @@ module Hadooken
       def run(index)
         @index = index
         @consumer_lookup = {}
-
-        Thread.new { handle_signals }
+        setup_helper_threads
 
         subscription.each_message do |message|
           Util.put_log("New message #{message.offset}", :debug)
@@ -52,6 +51,43 @@ module Hadooken
             end
             consumer
           end
+        end
+
+        # This method creates 2 threads;
+        # first one for handling signals for gracefull shutdown
+        # second one for sending heartbeat messages to topic.
+        def setup_helper_threads
+          timer_options = {
+            execution_interval: Hadooken.configuration.heartbeat[:frequency],
+            timeout_interval:   5
+          }
+
+          timer = Concurrent::TimerTask.new(timer_options) { send_heartbeat_message }
+          timer.execute
+          Thread.new { handle_signals }
+        end
+
+        def send_heartbeat_message
+          kafka.deliver_message(heartbeat_payload, topic: heartbeat_topic)
+          Util.put_log("Heartbeat message has been sent")
+        end
+
+        def heartbeat_payload
+          {
+            data: {
+              group_name: Hadooken.configuration.group_name,
+              index:      index,
+              message:    "I'm alive".freeze
+            },
+            meta: {
+              uuid: SecureRandom.uuid,
+              time: Time.now.rfc2822
+            }
+          }.to_json
+        end
+
+        def heartbeat_topic
+          @heartbeat_topic ||= Hadooken.configuration.heartbeat[:topic].to_s
         end
 
         def setup_signals
