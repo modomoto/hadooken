@@ -52,8 +52,8 @@ Configurable options via configuration yml file:
 - **workers<Integer>:**           Number of processes hadooken will use.
 - **threads<Integer>:**           Number of threads hadooken will spawn for each worker.
 - **topics<Dictionary>:**
-  - **key:**                      Name of the topic you want to register.
-  - **value:**                    Name of the class which will handle incoming messages.
+  * **key:**                      Name of the topic you want to register.
+  * **value:**                    Name of the class which will handle incoming messages.
 - **kafka<Dictionary>:**
   - **brokers:**                  An array of brookers list.
 - **require_env<String>:**        Custom path to require.
