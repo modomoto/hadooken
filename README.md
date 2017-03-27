@@ -55,11 +55,11 @@ Configurable options via configuration yml file:
     - **key:**                      Name of the topic you want to register.
     - **value:**                    Name of the class which will handle incoming messages.
 - **kafka<Dictionary>:**
-  - **brokers:**                  An array of brookers list.
+    - **brokers:**                  An array of brookers list.
 - **require_env<String>:**        Custom path to require.
 - **heartbeat<Dictionary>:**
-  - **topic:**                    The name of the topic that heartbeat messages will be published
-  - **frequency:**                Publish frequency
+    - **topic:**                    The name of the topic that heartbeat messages will be published
+    - **frequency:**                Publish frequency in seconds
 
 Also you can configure hadooken via ruby script! Create a file under initializerz directory of rails and fill it like so:
 
