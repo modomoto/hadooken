@@ -2,6 +2,14 @@
 
 $TESTING = false
 
-require_relative '../lib/hadooken'
+require_relative "../lib/hadooken"
 
-Hadooken::CLI.run
+job  = ARGV.first || "start"
+jobs = Hadooken::CLI.singleton_methods(false)
+
+if !jobs.include?(job.to_sym)
+  puts "Hadooken does not support `#{job}`!\nAvailable options are: #{jobs.join(', ')}"
+  exit 1
+end
+
+Hadooken::CLI.send(job)

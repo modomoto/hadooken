@@ -25,6 +25,21 @@ From the path of your project run the following;
 ```
 $ bundle exec hadooken
 ```
+
+other available commands are:
+
+```
+$ bundle exec hadooken start
+```
+
+```
+$ bundle exec hadooken stop
+```
+
+```
+$ bundle exec hadooken restart
+```
+
 ## Configuration
 
 Normally hadooken assumes that there is a configuration file located at `config/hadooken.yml` but you can change this behaviour while starting it like so:

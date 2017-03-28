@@ -2,7 +2,7 @@ module Hadooken
   class CLI
 
     class << self
-      def run
+      def start
         require_env
         Hadooken.configuration.validate!
         puts "Running Hadooken(because hadouken is taken :|)"
@@ -32,6 +32,34 @@ module Hadooken
         Util.put_log("Running master worker")
         Worker.run(-1)
         Process.waitall
+      end
+
+      def stop
+        if !File.exist?(pid_file)
+          puts "It looks like hadooken is already stopped!"
+          return
+        end
+
+        pids = File.read(pid_file).split("\n").join(' ')
+
+        puts "Killing process(es) with ID #{pids}"
+
+        # Instead of checking the process ID with `ps`
+        # we need to explicitly check our PID file to
+        # prevent race conditions!
+        `
+          kill #{pids}
+          while [ -f #{pid_file} ]; do
+            sleep 1
+          done
+        `
+
+        puts "Hadooken has been stopped"
+      end
+
+      def restart
+        stop
+        start
       end
 
       private
