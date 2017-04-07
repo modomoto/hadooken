@@ -26,8 +26,8 @@ module Hadooken
     # Parses ARGV and stores the configuration
     # options in options instance variable.
     def initialize
-      @options = { environment: :development }
-      @options.merge(parser.getopts)
+      @options = {}
+      parser.parse! # Populates the @options hash
       @options[:config_file] ||= DEFAULT_CONFIG_FILE if File.exist?(DEFAULT_CONFIG_FILE)
       parse_config_file if @options[:config_file]
     end
@@ -95,7 +95,7 @@ module Hadooken
         end
 
         configs = YAML.load_file(options[:config_file]).deep_symbolize_keys
-        options.reverse_merge!(configs[environment])
+        options.reverse_merge!(configs[environment] || {})
       end
 
   end

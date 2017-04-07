@@ -4,7 +4,12 @@ $TESTING = false
 
 require_relative "../lib/hadooken"
 
-job  = ARGV.first || "start"
+if ARGV.first && ARGV.first.starts_with?("-")
+  job = "start"
+else
+  job = ARGV.shift || "start"
+end
+
 jobs = Hadooken::CLI.singleton_methods(false)
 
 if !jobs.include?(job.to_sym)
