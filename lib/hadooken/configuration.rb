@@ -95,7 +95,7 @@ module Hadooken
         end
 
         configs = YAML.load_file(options[:config_file]).deep_symbolize_keys
-        options.reverse_merge!(configs[environment] || {})
+        options.reverse_merge!(configs[environment.to_sym] || {})
       end
 
   end

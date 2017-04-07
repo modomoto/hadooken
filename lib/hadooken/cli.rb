@@ -3,8 +3,8 @@ module Hadooken
 
     class << self
       def start
-        require_env
         Hadooken.configuration.validate!
+        require_env
         puts "Running Hadooken(because hadouken is taken :|)"
 
         if Hadooken.configuration.daemon
