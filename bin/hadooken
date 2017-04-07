@@ -2,6 +2,8 @@
 
 $TESTING = false
 
+HADOOKEN = true
+
 require_relative "../lib/hadooken"
 
 if ARGV.first && ARGV.first.starts_with?("-")
