@@ -3,6 +3,7 @@ require "hadooken/cli"
 require "hadooken/worker"
 require "hadooken/configuration"
 require "hadooken/util"
+require "hadooken/utils/digest_store"
 require "concurrent"
 require "active_support/all"
 
