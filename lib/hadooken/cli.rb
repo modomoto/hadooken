@@ -102,7 +102,7 @@ module Hadooken
         end
 
         def remove_pid_file
-          File.delete(pid_file) if File.exist?(pid_file)
+          File.delete(pid_file) if pid_file && File.exist?(pid_file)
         end
 
         def pid_file
