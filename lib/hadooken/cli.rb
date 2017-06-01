@@ -10,7 +10,7 @@ module Hadooken
         if Hadooken.configuration.daemon
           puts "Running as daemon"
           check_pid_file!
-          Process.daemon(true, true)
+          Process.daemon(true, false)
         end
 
         Thread.abort_on_exception = true
