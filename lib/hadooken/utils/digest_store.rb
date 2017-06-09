@@ -26,7 +26,7 @@ module Hadooken
           now = Time.now
           @lookup.delete_if{ |k, v| (now - v) > ttl }
           GC.start # It makes sense to call GC manually.
-          Kafka::Util.put_log('Digest store vacuumed', :info)
+          Hadooken::Util.put_log('Digest store vacuumed', :info)
         end
 
     end
