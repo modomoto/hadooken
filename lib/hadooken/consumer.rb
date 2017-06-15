@@ -35,7 +35,7 @@ module Hadooken
       # be done manually.
       def consume(data, meta)
         message = meta[:name]
-        handler = registers[message]
+        handler = handler_of(message)
 
         if !handler
           return put_log("No handler found for #{message}", :info)
