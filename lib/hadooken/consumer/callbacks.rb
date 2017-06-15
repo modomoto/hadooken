@@ -12,14 +12,11 @@ module Hadooken
       # callback either with +Proc+ or with +lambda+ or even by
       # providing the block like so:
       #
-      #   before_consume -> (data, meta) { puts meta }
-      #   before_consume Proc.new { |data, meta| puts meta }
-      #   before_consume do |_, meta|
+      #   before_consume -> { puts meta }
+      #   before_consume Proc.new { puts meta }
+      #   before_consume do
       #     puts meta
       #   end
-      #
-      # If you don't want to handle `data` and `meta` arguments,
-      # use +Proc+ instead of using +lambda+.
       #
       # It is also possible to register callbacks with options
       # `:except` and `:only` like so:
