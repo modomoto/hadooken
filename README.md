@@ -89,3 +89,67 @@ Also you can configure hadooken via ruby script! Create a file under initializer
     c.daemon         = true
   end
 ```
+
+## Consuming messages
+
+After mapping topics with the consumer classes `Hadooken` will call the `perform` method of the provided consumer class with passing **raw json payload** as string parameter. Basic consumer class should look like:
+
+```ruby
+class FooConsumer
+  def self.perform(payload)
+    puts payload
+  end
+end
+```
+
+At this point, you have to parse the json to work with and do your job with the data.
+If you've registered to a topic which has different type of messages recognizable by the `name` attribute wrapped into the `meta` attribute then you can do work with the data like so:
+
+```ruby
+class ZooConsumer
+  def self.perform(payload)
+    hash = JSON.parse(payload)
+
+    case hash[:meta][:name]
+    when 'lion'
+        runaway
+    when 'squirrel'
+        throw_nut
+    else
+        end_of_the_world
+    end
+  end
+
+  ...
+end
+```
+
+Or you can use extend your classes from **Hadooken::Consumer** class and enjoy!
+
+```ruby
+class ZooConsumer < Hadooken::Consumer
+  register :lion, :runaway
+  register :squirrel, :throw_nut
+
+  ...
+end
+```
+
+If you extend your consumer classes from **Hadooken::Consumer** class, you will be able to access the `data` via `data` instance variable same thing applies for the `meta`.
+
+You can also use `callback` support of **Hadooken::Consumer** class like so:
+
+```ruby
+class ZooConsumer < Hadooken::Consumer
+  register :lion, :runaway
+  register :squirrel, :throw_nut
+  register_rest :unknown_handler
+
+  before_consume :tie_shoelaces, only: :lion
+  before_consume :prepare_camera, except: :lion
+
+  ...
+end
+```
+
+For more information about the consumer and it's API please have a look at the `lib/hadooken/consumer.rb`.
