@@ -1,4 +1,5 @@
 require "active_support/all"
+require "concurrent"
 require "hadooken/version"
 require "hadooken/cli"
 require "hadooken/worker"
@@ -11,7 +12,6 @@ require "hadooken/consumer/duplicated_entry"
 require "hadooken/consumer/registery"
 require "hadooken/consumer/utils"
 require "hadooken/consumer"
-require "concurrent"
 
 module Hadooken
 
