@@ -18,11 +18,20 @@ module Hadooken
       end
 
       def handler_of(message)
-        registers[message] || @register_rest
+        handlers[message] ||= registers[message] || implicit_handler(message) || @register_rest
+      end
+
+      # Try to find public method with the name message.
+      def implicit_handler(message)
+        instance_methods(false).include?(message.to_sym) && message
       end
 
       def registers
         @registers ||= {}
+      end
+
+      def handlers
+        @handlers ||= {}
       end
 
     end
