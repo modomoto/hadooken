@@ -3,8 +3,11 @@ module Hadooken
 
     class << self
       def start
-        Hadooken.configuration.validate!
+        # We need to require the environment first
+        # because hadooken can be configured via
+        # ruby script like Rails' initializers.
         require_env
+        Hadooken.configuration.validate!
         puts "Running Hadooken(because hadouken is taken :|)"
 
         if Hadooken.configuration.daemon

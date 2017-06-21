@@ -47,11 +47,8 @@ module Hadooken
     end
 
     def validate!
-      if options[:daemon] && !(options[:logfile] && options[:pidfile])
-        puts "Can not be deamonized without logfile and pidfile options"
-        puts parser.on_tail "-h"
-        exit 1
-      end
+      validate_daemonization!
+      validate_consumers!
     end
 
     private
@@ -96,6 +93,30 @@ module Hadooken
 
         configs = YAML.load_file(options[:config_file]).deep_symbolize_keys
         options.reverse_merge!(configs[environment.to_sym] || {})
+      end
+
+      def validate_daemonization!
+        if options[:daemon] && !(options[:logfile] && options[:pidfile])
+          puts "Can not be deamonized without logfile and pidfile options"
+          puts parser.on_tail "-h"
+          exit 1
+        end
+      end
+
+      # Check the consumers before start
+      # If user provides wrong consumer name
+      # hadooken will stop at this step.
+      def validate_consumers!
+        return if !options[:topics]
+
+        options[:topics].each do |topic, consumer|
+          begin
+            consumer.constantize
+          rescue
+            puts "Couldn't constantize '#{consumer}'! Please check the configuration you've provided."
+            exit 1
+          end
+        end
       end
 
   end
