@@ -26,8 +26,7 @@ module Hadooken
 
         put_log("Payload consumed in #{m_seconds}", :debug)
       rescue => e
-        Raven.capture_exception(e)
-        put_log(e.class, :error)
+        Util.capture_error(e)
       end
 
       # By overriding this method you can use the legacy

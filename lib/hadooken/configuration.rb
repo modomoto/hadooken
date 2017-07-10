@@ -7,17 +7,18 @@ module Hadooken
 
     DEFAULT_CONFIG_FILE  = "config/hadooken.yml".freeze
     VALID_CONFIG_OPTIONS = {
-      group_name:  Socket.gethostname,
-      daemon:      false,
-      environment: :development,
-      logfile:     nil,
-      pidfile:     nil,
-      workers:     1,
-      threads:     16,
-      topics:      {},
-      kafka:       Hash.new({}),
-      require_env: nil,
-      heartbeat:   { topic: :consumer_heartbeat, frequency: 5 }
+      group_name:    Socket.gethostname,
+      daemon:        false,
+      environment:   :development,
+      logfile:       nil,
+      error_logfile: nil,
+      pidfile:       nil,
+      workers:       1,
+      threads:       16,
+      topics:        {},
+      kafka:         Hash.new({}),
+      require_env:   nil,
+      heartbeat:     { topic: :consumer_heartbeat, frequency: 5 }
     }.freeze
 
     attr_accessor :error_capturer

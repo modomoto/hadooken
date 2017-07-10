@@ -9,11 +9,19 @@ module Hadooken
 
       # debug|info|warn|error|fatal
       def put_log(message, level = :info)
-        mutex.synchronize { logger.send(level, message) }
+        logger.send(level, message)
+      end
+
+      def put_error_log(message)
+        error_logger.error(message)
       end
 
       def capture_error(e)
         error_capturer.call(e) if error_capturer
+
+        backtrace = e.backtrace.join("\n")
+        message   = "#{e.inspect}\n#{backtrace}"
+        put_error_log(message)
       end
 
       # error capturer should be a proc or lambda like:
@@ -33,6 +41,10 @@ module Hadooken
 
         def mutex
           @mutex ||= Mutex.new
+        end
+
+        def error_logger
+          @error_logger ||= Logger.new(Hadooken.configuration.error_logfile || STDERR)
         end
 
     end
