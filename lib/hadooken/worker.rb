@@ -17,7 +17,6 @@ module Hadooken
         end
       rescue => e
         Util.capture_error(e)
-        Util.put_log(e.message, :fatal)
       end
 
       private
