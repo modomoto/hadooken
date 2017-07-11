@@ -35,7 +35,6 @@ module Hadooken
           consumer_of(message.topic).perform(message.value)
         rescue => e
           Util.capture_error(e)
-          Util.put_log(e.message, :fatal)
         end
 
         def kafka
