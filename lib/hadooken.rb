@@ -1,3 +1,4 @@
+require "kafka"
 require "active_support/all"
 require "concurrent"
 require "hadooken/version"

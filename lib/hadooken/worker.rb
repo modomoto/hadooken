@@ -1,5 +1,3 @@
-require "kafka"
-
 module Hadooken
   class Worker
 
