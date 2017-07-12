@@ -34,6 +34,15 @@ module Hadooken
         @handlers ||= {}
       end
 
+      # This method returns all registration information which consists of
+      # both implicit and explicit registers.
+      def registered_messages
+        registered_methods = registers.map { |_, meth| meth if !meth.is_a?(Proc) }.compact
+        all_registrations  = registers.keys + instance_methods(false) - registered_methods
+
+        all_registrations.map(&:to_s)
+      end
+
     end
   end
 end
