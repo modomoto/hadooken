@@ -153,3 +153,10 @@ end
 ```
 
 For more information about the consumer and it's API please have a look at the `lib/hadooken/consumer.rb`.
+
+## TODOS
+
+- In cluster mode with multiple workers if one of the topics you've registered has just one partition this will crash the entire worker. Not the entire cluster but this should be fixed.
+- Consumer constantization should be done in one place(while booting), for now we are doing this whenever we need, does not effect the performance of consumers that bad though.
+- In cluster mode, send consumer data just once.
+- Write unit test(In progress)
