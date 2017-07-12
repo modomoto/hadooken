@@ -1,7 +1,7 @@
 module Hadooken
   class Consumer
     include Utils
-    extend Registery
+    extend Registry
     extend Callbacks
     extend Context
 

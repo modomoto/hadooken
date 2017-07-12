@@ -12,7 +12,7 @@ require "hadooken/utils/digest_store"
 require "hadooken/consumer/callbacks"
 require "hadooken/consumer/context"
 require "hadooken/consumer/duplicated_entry"
-require "hadooken/consumer/registery"
+require "hadooken/consumer/registry"
 require "hadooken/consumer/utils"
 require "hadooken/consumer"
 

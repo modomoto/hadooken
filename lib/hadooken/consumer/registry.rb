@@ -1,6 +1,6 @@
 module Hadooken
   class Consumer
-    module Registery
+    module Registry
 
       # Register message to either given handler method or
       # given block.
