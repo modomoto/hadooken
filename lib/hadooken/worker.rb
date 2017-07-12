@@ -9,6 +9,7 @@ module Hadooken
         @index   = index
         @consumer_lookup = {}
         setup_helpers
+        ConsumerData.notify
 
         subscription.each_message do |message|
           Util.put_log("New message #{message.offset}", :debug)

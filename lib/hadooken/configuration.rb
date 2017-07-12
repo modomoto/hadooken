@@ -18,7 +18,8 @@ module Hadooken
       topics:        {},
       kafka:         Hash.new({}),
       require_env:   nil,
-      heartbeat:     { topic: :consumer_heartbeat, frequency: 5 }
+      heartbeat:     { topic: :consumer_heartbeat, frequency: 5 },
+      meta_topic:    :consumer_data
     }.freeze
 
     attr_accessor :error_capturer
