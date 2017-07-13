@@ -29,7 +29,6 @@ module Hadooken
       def shutdown
         return if !@running
 
-        identity = index == -1 ? "master" : "#{index}. worker"
         Util.put_log("#{identity} is shutting down")
         Heartbeat.stop
         subscription.stop
@@ -72,6 +71,10 @@ module Hadooken
         def setup_helpers
           Heartbeat.start
           SignalHandler.start
+        end
+
+        def identity
+          index == -1 ? "master" : "#{index}. worker"
         end
 
     end
