@@ -18,8 +18,10 @@ module Hadooken
                 topics:     topic_data
               },
               meta: {
-                uuid: SecureRandom.uuid,
-                time: Time.now.rfc2822
+                name:    "registered_messages",
+                version: "1.0",
+                uuid:    SecureRandom.uuid,
+                time:    Time.now.rfc2822
               }
             }.to_json
           end
