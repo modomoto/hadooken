@@ -1,5 +1,3 @@
-require "kafka"
-
 module Hadooken
   class Worker
 
@@ -7,9 +5,11 @@ module Hadooken
       attr_reader :index
 
       def run(index)
-        @index = index
+        @running = true
+        @index   = index
         @consumer_lookup = {}
-        setup_helper_threads
+        setup_helpers
+        ConsumerData.notify
 
         subscription.each_message do |message|
           Util.put_log("New message #{message.offset}", :debug)
@@ -17,6 +17,24 @@ module Hadooken
         end
       rescue => e
         Util.capture_error(e)
+        shutdown
+      end
+
+      # We are using this method in inner classes
+      # therefore it has to be public.
+      def kafka
+        @kafka ||= Kafka.new(seed_brokers: Hadooken.configuration.kafka[:brokers])
+      end
+
+      def shutdown
+        return if !@running
+
+        Util.put_log("#{identity} is shutting down")
+        Heartbeat.stop
+        subscription.stop
+        pool.shutdown
+      ensure
+        @running = false
       end
 
       private
@@ -35,11 +53,6 @@ module Hadooken
           consumer_of(message.topic).perform(message.value)
         rescue => e
           Util.capture_error(e)
-          Util.put_log(e.message, :fatal)
-        end
-
-        def kafka
-          @kafka ||= Kafka.new(seed_brokers: Hadooken.configuration.kafka[:brokers])
         end
 
         def subscription
@@ -55,66 +68,13 @@ module Hadooken
         # This method creates 2 threads;
         # first one for handling signals for gracefull shutdown
         # second one for sending heartbeat messages to topic.
-        def setup_helper_threads
-          heartbeat_timer.execute
-          Thread.new { handle_signals }
+        def setup_helpers
+          Heartbeat.start
+          SignalHandler.start
         end
 
-        def heartbeat_timer
-          @heartbeat_timer ||= begin
-            timer_options = {
-              execution_interval: Hadooken.configuration.heartbeat[:frequency],
-              timeout_interval:   5
-            }
-
-            Concurrent::TimerTask.new(timer_options) { send_heartbeat_message }
-          end
-        end
-
-        def send_heartbeat_message
-          kafka.deliver_message(heartbeat_payload, topic: heartbeat_topic)
-          Util.put_log("Heartbeat message has been sent")
-        end
-
-        def heartbeat_payload
-          {
-            data: {
-              group_name: Hadooken.configuration.group_name,
-              index:      index,
-              message:    "I'm alive".freeze
-            },
-            meta: {
-              uuid: SecureRandom.uuid,
-              time: Time.now.rfc2822
-            }
-          }.to_json
-        end
-
-        def heartbeat_topic
-          @heartbeat_topic ||= Hadooken.configuration.heartbeat[:topic].to_s
-        end
-
-        def setup_signals
-          reader, writer = IO.pipe
-
-          %w(TERM QUIT SIGINT).each do |sig|
-            trap(sig) { writer.puts sig }
-          end
-
-          reader
-        end
-
-        def handle_signals
-          reader = setup_signals
-
-          while !reader.closed? && IO.select([reader])
-            identity = index == -1 ? "master" : "#{index}. worker"
-            Util.put_log("#{identity} is shutting down")
-            subscription.stop
-            heartbeat_timer.shutdown
-            pool.shutdown
-            reader.close
-          end
+        def identity
+          index == -1 ? "master" : "#{index}. worker"
         end
 
     end
