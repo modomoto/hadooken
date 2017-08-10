@@ -16,16 +16,17 @@ module Hadooken
         error_logger.error(message)
       end
 
-      def capture_error(e)
-        error_capturer.call(e) if error_capturer
+      def capture_error(error, **context)
+        error_capturer.call(error, context) if error_capturer
 
-        backtrace = e.backtrace.join("\n")
-        message   = "#{e.inspect}\n#{backtrace}"
+        backtrace = error.backtrace.join("\n")
+        message   = "#{error.inspect}\n#{backtrace}"
         put_error_log(message)
       end
 
-      # error capturer should be a proc or lambda like:
-      #   -> (e) { Raven.capture_exception(e) }
+      # In case of an error, Hadooken will call the proc with
+      # the error instance and the context information.
+      #   -> (error, context) { Raven.capture_exception(error) }
       def error_capturer
         @error_capturer ||= Hadooken.configuration.error_capturer
       end

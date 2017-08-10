@@ -26,7 +26,7 @@ module Hadooken
 
         put_log("Payload consumed in #{m_seconds}", :debug)
       rescue => e
-        Util.capture_error(e)
+        Util.capture_error(e, payload: payload)
       end
 
       # By overriding this method you can use the legacy
