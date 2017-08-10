@@ -82,7 +82,7 @@ Also you can configure hadooken via ruby script! Create a file under initializer
   require 'hadooken'
 
   Hadooken.configure do |c|
-    c.error_capturer = -> (e) { puts e.class }
+    c.error_capturer = -> (error, context) { puts error.class }
     c.heartbeat      = { topic: :consumer_heartbeat, frequency: 0.1 }
     c.logfile        = 'tmp/hadooken.log'
     c.pidfile        = 'tmp/hadooken.pid'

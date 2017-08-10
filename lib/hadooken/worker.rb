@@ -52,7 +52,7 @@ module Hadooken
         def dispatch(message)
           consumer_of(message.topic).perform(message.value)
         rescue => e
-          Util.capture_error(e)
+          Util.capture_error(e, payload: message.value)
         end
 
         def subscription
