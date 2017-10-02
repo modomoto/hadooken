@@ -17,10 +17,10 @@ module Hadooken
       end
 
       def capture_error(error, **context)
+        raise error if Hadooken.test_env?
         error_capturer.call(error, context) if error_capturer
 
-        backtrace = error.backtrace.join("\n")
-        message   = "#{error.inspect}\n#{backtrace}"
+        message = message_for_error(error)
         put_error_log(message)
       end
 
@@ -46,6 +46,11 @@ module Hadooken
 
         def error_logger
           @error_logger ||= Logger.new(Hadooken.configuration.error_logfile || STDERR)
+        end
+
+        def message_for_error(error)
+          backtrace = error.backtrace.join("\n")
+          message   = "#{error.inspect}\n#{backtrace}"
         end
 
     end
