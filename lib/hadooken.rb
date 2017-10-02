@@ -28,7 +28,7 @@ module Hadooken
   #     config.group_name     = "ConsumerGroupName"
   #   end
   def self.configure(&block)
-    block.call(configuration) if const_defined?(:HADOOKEN) || test_env?
+    block.call(configuration) if const_defined?(:HADOOKEN)
   end
 
   def self.configuration
