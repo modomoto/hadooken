@@ -24,15 +24,19 @@ module Hadooken
   #   require "hadooken"
   #
   #   Hadooken.configure do |config|
-  #     config.error_capturer = -> (error) { puts error.class }
+  #     config.error_capturer = -> (error, context) { puts [error.class, context] }
   #     config.group_name     = "ConsumerGroupName"
   #   end
   def self.configure(&block)
-    block.call(configuration) if const_defined?(:HADOOKEN)
+    block.call(configuration) if const_defined?(:HADOOKEN) || test_env?
   end
 
   def self.configuration
     @configuration ||= Configuration.new
+  end
+
+  def self.test_env?
+    configuration.environment.to_sym == :test
   end
 
 end
