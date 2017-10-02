@@ -29,7 +29,13 @@ module Hadooken
     # options in options instance variable.
     def initialize
       @options = {}
-      parser.parse! # Populates the @options hash
+      # Populate the @options hash, if and only if
+      # hadooken started directly by its own command.
+      # The reason is, ARGV can be populated by puma
+      # or rspec configuration options and this options
+      # can be unrecognized by Hadooken and will lead
+      # an exception in OptionParser.
+      parser.parse! if Kernel.const_defined?(:HADOOKEN)
       @options[:config_file] ||= DEFAULT_CONFIG_FILE if File.exist?(DEFAULT_CONFIG_FILE)
       parse_config_file if @options[:config_file]
     end
