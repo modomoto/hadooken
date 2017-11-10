@@ -1,7 +1,8 @@
 module Hadooken
   class Consumer
     module Callbacks
-      # Register before_consume callbacks like AC callbacks
+      # Registers before_consume callback like AC callbacks to
+      # run before consumer action.
       #
       # To call a method with `data` and the `meta` parameters for
       # all type of messages, you can register the callback like so:
@@ -25,9 +26,22 @@ module Hadooken
       #   before_consume :do_another_thig, except: [:order_paid]
       #
       def before_consume(handler = nil, **options, &block)
+        set_callback(:before, handler, options, &block)
+      end
+
+      # Registers after_consume callback like AC callbacks to
+      # run after consumer action.
+      #
+      # All the parameters and options are same with before_consume
+      # callback.
+      def after_consume(handler = nil, **options, &block)
+        set_callback(:after, handler, options, &block)
+      end
+
+      def set_callback(callback_type, handler, options, &block)
         raise 'Provide either handler method or block to consume message!' if !handler && !block
 
-        before_callbacks << { handler: (handler || block), options: sanitize_options(options) }
+        callbacks[callback_type] << { handler: (handler || block), options: sanitize_options(options) }
       end
 
       def sanitize_options(options)
@@ -49,12 +63,12 @@ module Hadooken
         (value.is_a?(Array) ? value : [value]).map(&:to_s)
       end
 
-      def before_callbacks
-        @before_callbacks ||= []
+      def callbacks
+        @callbacks ||= { before: [], after: [] }
       end
 
-      def run_callbacks(instance, message_name)
-        before_callbacks.each do |callback|
+      def run_callbacks(type, instance, message_name)
+        callbacks[type].each do |callback|
           if execute?(message_name, callback[:options])
             run_in_context(instance, callback[:handler])
           end

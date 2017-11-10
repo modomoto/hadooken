@@ -42,8 +42,9 @@ module Hadooken
 
         instance = new(data, meta)
 
-        run_callbacks(instance, message)
+        run_callbacks(:before, instance, message)
         run_in_context(instance, handler)
+        run_callbacks(:after, instance, message)
       end
 
     end
