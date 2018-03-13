@@ -53,6 +53,8 @@ module Hadooken
           consumer_of(message.topic).perform(message.value)
         rescue => e
           Util.capture_error(e, payload: message.value)
+        ensure
+          release_resources
         end
 
         def subscription
@@ -75,6 +77,12 @@ module Hadooken
 
         def identity
           index == -1 ? "master" : "#{index}. worker"
+        end
+
+        def release_resources
+          if defined?(ActiveRecord) && ::ActiveRecord::Base.connected?
+            ::ActiveRecord::Base.clear_active_connections!
+          end
         end
 
     end
