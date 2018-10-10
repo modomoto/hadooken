@@ -6,7 +6,7 @@ module Hadooken
 
         def notify
           Util.put_log("Sending registration information")
-          Worker.kafka.deliver_message(payload, topic: topic)
+          Hadooken.kafka_client.deliver_message(payload, topic: topic)
         end
 
         private
