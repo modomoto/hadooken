@@ -39,4 +39,8 @@ module Hadooken
     configuration.environment.to_sym == :test
   end
 
+  def self.kafka_client
+    @kafka_client ||= Kafka.new(seed_brokers: configuration.kafka[:brokers])
+  end
+
 end

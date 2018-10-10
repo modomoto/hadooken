@@ -24,7 +24,7 @@ module Hadooken
           end
 
           def send_message
-            Worker.kafka.deliver_message(payload, topic: heartbeat_topic)
+            Hadooken.kafka_client.deliver_message(payload, topic: heartbeat_topic)
             Util.put_log("Heartbeat message has been sent")
           end
 

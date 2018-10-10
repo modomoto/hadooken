@@ -20,12 +20,6 @@ module Hadooken
         shutdown
       end
 
-      # We are using this method in inner classes
-      # therefore it has to be public.
-      def kafka
-        @kafka ||= Kafka.new(seed_brokers: Hadooken.configuration.kafka[:brokers])
-      end
-
       def shutdown
         return if !@running
 
@@ -59,7 +53,7 @@ module Hadooken
 
         def subscription
           @subscription ||= begin
-            consumer = kafka.consumer(group_id: Hadooken.configuration.group_name)
+            consumer = Hadooken.kafka_client.consumer(group_id: Hadooken.configuration.group_name)
             Hadooken.configuration.topics.each do |topic_name, _|
               consumer.subscribe(topic_name.to_s)
             end
