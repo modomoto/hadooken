@@ -33,18 +33,21 @@ module Hadooken
       # version of consumer. Which means dispatching can
       # be done manually.
       def consume(data, meta)
-        message = meta[:name]
-        handler = handler_of(message)
+        handler = handler_of(meta[:name])
 
         if !handler
-          return put_log("No handler found for #{message}", :info)
+          return put_log("No handler found for #{meta[:name]}", :info)
         end
 
+        run(handler, data, meta)
+      end
+
+      def run(handler, data, meta)
         instance = new(data, meta)
 
-        run_callbacks(:before, instance, message)
+        run_callbacks(:before, instance, meta[:name])
         run_in_context(instance, handler)
-        run_callbacks(:after, instance, message)
+        run_callbacks(:after, instance, meta[:name])
       end
 
     end
