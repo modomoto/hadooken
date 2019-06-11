@@ -16,6 +16,8 @@ require "hadooken/consumer/duplicated_entry"
 require "hadooken/consumer/registry"
 require "hadooken/consumer/utils"
 require "hadooken/consumer"
+require "hadooken/publisher"
+require "hadooken/errors/missing_topic"
 
 module Hadooken
 
@@ -40,7 +42,11 @@ module Hadooken
   end
 
   def self.kafka_client
-    @kafka_client ||= Kafka.new(seed_brokers: configuration.kafka[:brokers])
+    @kafka_client ||= configuration.kafka[:client].new(seed_brokers: configuration.kafka[:brokers])
+  end
+
+  def self.producer
+    @producer ||= kafka_client.async_producer(configuration.producer)
   end
 
 end

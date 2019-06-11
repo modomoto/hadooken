@@ -16,7 +16,9 @@ module Hadooken
       workers:       1,
       threads:       16,
       topics:        {},
-      kafka:         Hash.new({}),
+      kafka:         { client: Kafka },
+      test:          {},
+      producer:      { delivery_treshhold: 100, delivery_interval: 10 },
       require_env:   nil,
       heartbeat:     { topic: :consumer_heartbeat, frequency: 5 },
       meta_topic:    :consumer_data
