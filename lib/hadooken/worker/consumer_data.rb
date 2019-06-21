@@ -14,7 +14,7 @@ module Hadooken
             {
               data: {
                 group_name: Hadooken.configuration.group_name,
-                index:      Worker.index,
+                name:       Worker.name,
                 topics:     topic_data
               },
               meta: {
@@ -27,7 +27,7 @@ module Hadooken
           end
 
           def topic_data
-            Hadooken.configuration.topics.map do |topic, consumer|
+            Worker.configs[:topics].map do |topic, consumer|
               consumer_class = consumer.constantize
 
               # Someone try to register consumer which is

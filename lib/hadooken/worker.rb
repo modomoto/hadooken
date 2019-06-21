@@ -1,19 +1,18 @@
 module Hadooken
   class Worker
-
     class << self
-      attr_reader :index
+      attr_reader :name, :configs
 
-      def run(index)
+      def run(name, configs)
         @running = true
-        @index   = index
-        @consumer_lookup = {}
+        @name = name
+        @configs = configs
         setup_helpers
         ConsumerData.notify
 
         subscription.each_message do |message|
           Util.put_log("New message #{message.offset}", :debug)
-          pool.post { dispatch(message) }
+          executor.execute(message)
         end
       rescue => e
         Util.capture_error(e)
@@ -23,42 +22,27 @@ module Hadooken
       def shutdown
         return if !@running
 
-        Util.put_log("#{identity} is shutting down")
+        Util.put_log("#{name} worker is shutting down")
         Heartbeat.stop
         subscription.stop
-        pool.shutdown
+        executor.shutdown
       ensure
         @running = false
       end
 
       private
-        def pool
-          @pool ||= Concurrent::ThreadPoolExecutor.new(min_threads: 1,
-                                                       max_threads: Hadooken.configuration.threads,
-                                                       max_queue:   -1,
-                                                       fallback_policy: :caller_runs)
-        end
-
-        def consumer_of(topic)
-          @consumer_lookup[topic] ||= Hadooken.configuration.topics[topic.to_sym].constantize
-        end
-
-        def dispatch(message)
-          consumer_of(message.topic).perform(message.value)
-        rescue => e
-          Util.capture_error(e, payload: message.value)
-        ensure
-          release_resources
-        end
-
         def subscription
           @subscription ||= begin
-            consumer = Hadooken.kafka_client.consumer(group_id: Hadooken.configuration.group_name)
-            Hadooken.configuration.topics.each do |topic_name, _|
+            consumer = Hadooken.kafka_client.consumer(group_id: group_id)
+            configs[:topics].each do |topic_name, _|
               consumer.subscribe(topic_name.to_s)
             end
             consumer
           end
+        end
+
+        def group_id
+          "#{Hadooken.configuration.group_name}/#{name}"
         end
 
         # This method creates 2 threads;
@@ -69,14 +53,8 @@ module Hadooken
           SignalHandler.start
         end
 
-        def identity
-          index == -1 ? "master" : "#{index}. worker"
-        end
-
-        def release_resources
-          if defined?(ActiveRecord) && ::ActiveRecord::Base.connected?
-            ::ActiveRecord::Base.clear_active_connections!
-          end
+        def executor
+          @executor ||= Factories::Executor.create(configs)
         end
 
     end

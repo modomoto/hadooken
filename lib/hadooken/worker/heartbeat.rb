@@ -1,6 +1,7 @@
 module Hadooken
   class Worker
     class Heartbeat
+      HEARTBEAT_MESSAGE_NAME = "i_am_alive"
 
       class << self
         def start
@@ -32,10 +33,11 @@ module Hadooken
             {
               data: {
                 group_name: Hadooken.configuration.group_name,
-                index:      Worker.index,
+                name:       Worker.name,
                 message:    "I'm alive".freeze
               },
               meta: {
+                name: HEARTBEAT_MESSAGE_NAME,
                 uuid: SecureRandom.uuid,
                 time: Time.now.rfc2822
               }
