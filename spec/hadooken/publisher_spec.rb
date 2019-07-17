@@ -32,7 +32,9 @@ describe Hadooken::Publisher do
   end
 
   describe "::message_name" do
-    subject { FooBarPublisher.message_name }
+    let(:publisher_options) { {} }
+
+    subject { FooBarPublisher.new(nil, publisher_options).send(:message_name) }
 
     context "when the message_name is not specified" do
       let(:inferred_message_name) { "foo_bar" }
@@ -41,11 +43,23 @@ describe Hadooken::Publisher do
     end
 
     context "when the message_name is specified" do
-      let(:specified_message_name) { "test-message" }
+      context "when the message_name responds to `call` messages" do
+        let(:message_name_from_options) { "message-name-from-options" }
+        let(:publisher_options) { { message_name: message_name_from_options } }
+        let(:specified_message_name) { Proc.new { options[:message_name] } }
 
-      before { FooBarPublisher.message_name = specified_message_name }
+        before { FooBarPublisher.message_name = specified_message_name }
 
-      it { is_expected.to eql(specified_message_name) }
+        it { is_expected.to eql(message_name_from_options) }
+      end
+
+      context "when the message_name does not respond to `call` messages" do
+        let(:specified_message_name) { "test-message" }
+
+        before { FooBarPublisher.message_name = specified_message_name }
+
+        it { is_expected.to eql(specified_message_name) }
+      end
     end
   end
 
@@ -66,7 +80,9 @@ describe Hadooken::Publisher do
   end
 
   describe "::topic" do
-    subject { FooBarPublisher.topic }
+    let(:publisher_options) { {} }
+
+    subject { FooBarPublisher.new(nil, publisher_options).send(:topic) }
 
     context "when the topic is not specified" do
       it "raises exception" do
@@ -75,11 +91,23 @@ describe Hadooken::Publisher do
     end
 
     context "when the topic is specified" do
-      let(:specified_topic) { "topic" }
+      context "when the topic responds to `call` messages" do
+        let(:topic_name_from_options) { "topic-name-from-options" }
+        let(:publisher_options) { { topic: topic_name_from_options } }
+        let(:specified_topic) { Proc.new { options[:topic] } }
 
-      before { FooBarPublisher.topic = specified_topic }
+        before { FooBarPublisher.topic = specified_topic }
 
-      it { is_expected.to eql(specified_topic) }
+        it { is_expected.to eql(topic_name_from_options) }
+      end
+
+      context "when the topic does not respond to `call` messages" do
+        let(:specified_topic) { "topic" }
+
+        before { FooBarPublisher.topic = specified_topic }
+
+        it { is_expected.to eql(specified_topic) }
+      end
     end
   end
 
