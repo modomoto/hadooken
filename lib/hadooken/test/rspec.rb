@@ -1,6 +1,13 @@
+require 'hadooken'
 require "rspec/expectations"
 require "json-schema"
 require "hadooken/test"
+
+RSpec::Matchers.define :create_topic_named do |expected|
+  match do |topic|
+    topic.name == expected
+  end
+end
 
 RSpec::Matchers.define :have_version do |expected|
   match do |envelope|

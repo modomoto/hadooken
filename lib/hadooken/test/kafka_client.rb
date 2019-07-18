@@ -7,6 +7,19 @@ module Hadooken
         AsyncProducer.new
       end
 
+      def create_topic(name, **options)
+        Topic.new(name, options)
+      end
+
+      class Topic
+        attr_reader :name, :options
+
+        def initialize(name, **options)
+          @name = name
+          @options = options
+        end
+      end
+
       class AsyncProducer
         class Envelope
           attr_reader :message, :topic
