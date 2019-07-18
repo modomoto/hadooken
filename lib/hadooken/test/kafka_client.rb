@@ -55,8 +55,12 @@ module Hadooken
             end
         end
 
-        def produce(message, topic:)
+        def produce(message, topic:, **options)
           Envelope.new(message, topic)
+        end
+
+        def shutdown
+          true
         end
       end
     end

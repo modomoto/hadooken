@@ -4,7 +4,7 @@ module Hadooken
     NAME_PATTERN = /(.+)(?:Publisher?)/
 
     class << self
-      attr_writer :version, :message_name, :serializer, :topic
+      attr_writer :version, :message_name, :serializer, :topic, :partition_key
 
       def version
         @version ||= DEFAULT_VERSION
@@ -26,12 +26,16 @@ module Hadooken
         { version: version, name: computed_message_name, time: time }
       end
 
+      def partition_key
+        @partition_key ||= :id
+      end
+
       def publish(object, **options)
         new(object, options).publish
       end
 
-      def produce(payload, computed_topic)
-        Hadooken.producer.produce(payload, topic: computed_topic)
+      def produce(payload, computed_topic, computed_partition_key)
+        Hadooken.producer.produce(payload, topic: computed_topic, partition_key: computed_partition_key)
       end
 
       private
@@ -63,7 +67,7 @@ module Hadooken
     end
 
     def publish
-      self.class.produce(payload, topic)
+      self.class.produce(payload, topic, partition_key)
     end
 
     private
@@ -84,6 +88,10 @@ module Hadooken
 
       def message_name
         self.class.message_name.respond_to?(:call) ? instance_exec(&self.class.message_name) : self.class.message_name
+      end
+
+      def partition_key
+        object.public_send(self.class.partition_key) if object.respond_to?(self.class.partition_key)
       end
 
   end
