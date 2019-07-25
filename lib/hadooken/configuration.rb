@@ -13,9 +13,7 @@ module Hadooken
       logfile:       nil,
       error_logfile: nil,
       pidfile:       nil,
-      workers:       1,
-      threads:       16,
-      topics:        {},
+      workers:       {},
       kafka:         { client: Kafka },
       test:          {},
       producer:      { delivery_threshold: 100, delivery_interval: 10 },
@@ -117,9 +115,7 @@ module Hadooken
       # If user provides wrong consumer name
       # hadooken will stop at this step.
       def validate_consumers!
-        return if !options[:topics]
-
-        options[:topics].each do |topic, consumer|
+        consumers.each do |consumer|
           begin
             consumer.constantize
           rescue
@@ -127,6 +123,10 @@ module Hadooken
             exit 1
           end
         end
+      end
+
+      def consumers
+        workers.flat_map { |_, configs| configs[:topics].map { |_, consumer| consumer } }
       end
 
   end

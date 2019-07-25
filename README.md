@@ -64,11 +64,14 @@ Configurable options via configuration yml file:
 - **environment<String|Symbol>:** Environment to run.
 - **logfile<String>:** Location of the log file. Required if daemon is true.
 - **pidfile<String>:** Location of the pid file. Required if daemon is true.
-- **workers<Integer>:** Number of processes hadooken will use.
-- **threads<Integer>:** Number of threads hadooken will spawn for each worker.
-- **topics<Dictionary>:**
-  - **key:** Name of the topic you want to register.
-  - **value:** Name of the class which will handle incoming messages.
+- **workers<Dictionary>:**
+  - **key<Symbol>:** Name of the Worker
+  - **value<Dictionary>:**
+    - **type<enum(single_thread|multi_thread)>** Either run the worker with multiple threads or with single thread
+    - **threads<Integer>:** Number of threads, relevant only in *multi_thread* mode.
+    - **topics<Dictionary>:**
+      - **key<Symbol>:** Name of the topic
+      - **value<String>:** Name of the consumer class
 - **kafka<Dictionary>:**
   - **client:** The client library to be used to connect Kafka. Default is Kafka.
   - **brokers:** An array of brookers list.
@@ -90,6 +93,15 @@ Also you can configure hadooken via ruby script! Create a file under initializer
     c.logfile        = 'tmp/hadooken.log'
     c.pidfile        = 'tmp/hadooken.pid'
     c.daemon         = true
+    c.workers        = {
+        default: {
+            type: :multi_thread,
+            threads: 16,
+            topics: {
+                foo: "Bar"
+            }
+        }
+    }
   end
 ```
 
@@ -118,63 +130,72 @@ FooPublisher.publish(foo) # Will send the payload generated for `foo` object to 
 
 ## Consuming messages
 
-After mapping topics with the consumer classes `Hadooken` will call the `perform` method of the provided consumer class with passing **raw json payload** as string parameter. Basic consumer class should look like:
+After mapping topics with the consumer classes `Hadooken` will call the correct method in mapped consumer class whenever it receives a message from Kafka.
+
+Imagine you have the following configuration;
 
 ```ruby
-class FooConsumer
-  def self.perform(payload)
-    puts payload
+Hadooken.configure do |c|
+    c.workers = {
+        default: {
+            type: :single_thread,
+            topics: {
+                user: "UserConsumer"
+            }
+        }
+    }
+  end
+```
+
+And following publisher class;
+
+```ruby
+class UserCreatedPublisher < Hadooken::Publisher
+  self.topic = "user"
+  self.message_name = "user_created"
+end
+```
+
+And the following consumer;
+
+```ruby
+class UserConsumer < Hadooken::Consumer
+  def user_created
+    puts data
   end
 end
 ```
 
-At this point, you have to parse the json to work with and do your job with the data.
-If you've registered to a topic which has different type of messages recognizable by the `name` attribute wrapped into the `meta` attribute then you can do work with the data like so:
+Then, whenever you send a message using the `UserCreatedPublisher`, Hadooken will create an instance of `UserConsumer` and call `user_created` method of that instance.
+
+You can also change the method dispatching by registering message names with method names like so;
 
 ```ruby
-class ZooConsumer
-  def self.perform(payload)
-    hash = JSON.parse(payload)
+class UserConsumer < Hadooken::Consumer
+  register :user_created, :consume_user_created_message
 
-    case hash[:meta][:name]
-    when 'lion'
-        runaway
-    when 'squirrel'
-        throw_nut
-    else
-        end_of_the_world
-    end
+  def consume_user_created_message
+    puts data
   end
-
-  ...
 end
 ```
-
-Or you can use extend your classes from **Hadooken::Consumer** class and enjoy!
-
-```ruby
-class ZooConsumer < Hadooken::Consumer
-  register :lion, :runaway
-  register :squirrel, :throw_nut
-
-  ...
-end
-```
-
-If you extend your consumer classes from **Hadooken::Consumer** class, you will be able to access the `data` via `data` instance variable same thing applies for the `meta`.
 
 You can also use `callback` support of **Hadooken::Consumer** class like so:
 
 ```ruby
-class ZooConsumer < Hadooken::Consumer
-  register :lion, :runaway
-  register :squirrel, :throw_nut
-  register_rest :unknown_handler
+class UserConsumer < Hadooken::Consumer
+  register :user_updated, :consume_user_updated_message
+  before_consume :fetch_user, only: :user_updated
 
-  before_consume :tie_shoelaces, only: :lion
-  before_consume :prepare_camera, except: :lion
+  def consume_user_updated_message
+    puts data
+  end
 
-  ...
+  private
+    def fetch_user
+      ...
+    end
+
 end
 ```
 

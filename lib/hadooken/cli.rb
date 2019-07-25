@@ -8,7 +8,7 @@ module Hadooken
         # ruby script like Rails' initializers.
         require_env
         Hadooken.configuration.validate!
-        puts "Running Hadooken(because hadouken is taken :|)"
+        puts "Running Hadooken"
 
         if Hadooken.configuration.daemon
           puts "Running as daemon"
@@ -16,24 +16,14 @@ module Hadooken
           Process.daemon(true, false)
         end
 
-        Thread.abort_on_exception = true
-
-        pids = [Process.pid]
-        (Hadooken.configuration.workers - 1).times do |index, worker|
-          Util.put_log("Running #{index}. worker")
-
-          pids << fork { Worker.run(index) }
-        end
-
-        fill_pid_file(pids) if Hadooken.configuration.daemon
-
         at_exit do
           Util.put_log("Bye bye.")
           remove_pid_file
         end
 
-        Util.put_log("Running master worker")
-        Worker.run(-1)
+        pids = Factories::Worker.create
+        fill_pid_file(pids) if Hadooken.configuration.daemon
+
         Process.waitall
       end
 

@@ -7,14 +7,14 @@ describe Hadooken::Consumer::Callbacks do
       it 'runs the callback before running consumer action' do
         expect_any_instance_of(CallbackTestConsumer).to receive(:run_with_test_1).twice
 
-        CallbackTestConsumer.consume({}, { name: 'test_1' })
+        CallbackTestConsumer.consume({}, { name: 'test_1' }, 'test')
       end
 
       it 'runs the callback and the action itself in correct order' do
         expect(CallbackTestConsumer).to receive(:before_with_callback).ordered
         expect(CallbackTestConsumer).to receive(:before_with_action).ordered
 
-        CallbackTestConsumer.consume({}, { name: 'test_1' })
+        CallbackTestConsumer.consume({}, { name: 'test_1' }, 'test')
       end
     end
 
@@ -23,7 +23,7 @@ describe Hadooken::Consumer::Callbacks do
         it 'runs the callback before running consumer action' do
           expect_any_instance_of(CallbackTestConsumer).to receive(:run_with_test_2).twice
 
-          CallbackTestConsumer.consume({}, { name: 'test_2' })
+          CallbackTestConsumer.consume({}, { name: 'test_2' }, 'test')
         end
       end
 
@@ -31,7 +31,7 @@ describe Hadooken::Consumer::Callbacks do
         it 'does not run the callback before running consumer action' do
           expect_any_instance_of(CallbackTestConsumer).not_to receive(:run_with_test_3)
 
-          CallbackTestConsumer.consume({}, { name: 'test_2' })
+          CallbackTestConsumer.consume({}, { name: 'test_2' }, 'test')
         end
       end
     end
@@ -41,7 +41,7 @@ describe Hadooken::Consumer::Callbacks do
         it 'does not run the callback before running consumer action' do
           expect_any_instance_of(CallbackTestConsumer).not_to receive(:run_with_test_4)
 
-          CallbackTestConsumer.consume({}, { name: 'test_2' })
+          CallbackTestConsumer.consume({}, { name: 'test_2' }, 'test')
         end
       end
 
@@ -49,7 +49,7 @@ describe Hadooken::Consumer::Callbacks do
         it 'runs the callback before running consumer action' do
           expect_any_instance_of(CallbackTestConsumer).to receive(:run_with_test_5)
 
-          CallbackTestConsumer.consume({}, { name: 'test_2' })
+          CallbackTestConsumer.consume({}, { name: 'test_2' }, 'test')
         end
       end
     end
@@ -60,14 +60,14 @@ describe Hadooken::Consumer::Callbacks do
       it 'runs the callback after running consumer action' do
         expect_any_instance_of(CallbackTestConsumer).to receive(:run_with_test_1).twice
 
-        CallbackTestConsumer.consume({}, { name: 'test_1' })
+        CallbackTestConsumer.consume({}, { name: 'test_1' }, 'test')
       end
 
       it 'runs the callback and the action itself in correct order' do
         expect(CallbackTestConsumer).to receive(:after_with_action).ordered
         expect(CallbackTestConsumer).to receive(:after_with_callback).ordered
 
-        CallbackTestConsumer.consume({}, { name: 'test_1' })
+        CallbackTestConsumer.consume({}, { name: 'test_1' }, 'test')
       end
     end
 
@@ -76,7 +76,7 @@ describe Hadooken::Consumer::Callbacks do
         it 'runs the callback after running consumer action' do
           expect_any_instance_of(CallbackTestConsumer).to receive(:run_with_test_7).once
 
-          CallbackTestConsumer.consume({}, { name: 'test_2' })
+          CallbackTestConsumer.consume({}, { name: 'test_2' }, 'test')
         end
       end
 
@@ -84,7 +84,7 @@ describe Hadooken::Consumer::Callbacks do
         it 'does not run the callback after running consumer action' do
           expect_any_instance_of(CallbackTestConsumer).not_to receive(:run_with_test_8)
 
-          CallbackTestConsumer.consume({}, { name: 'test_2' })
+          CallbackTestConsumer.consume({}, { name: 'test_2' }, 'test')
         end
       end
     end
@@ -94,7 +94,7 @@ describe Hadooken::Consumer::Callbacks do
         it 'does not run the callback after running consumer action' do
           expect_any_instance_of(CallbackTestConsumer).not_to receive(:run_with_test_9)
 
-          CallbackTestConsumer.consume({}, { name: 'test_2' })
+          CallbackTestConsumer.consume({}, { name: 'test_2' }, 'test')
         end
       end
 
@@ -102,7 +102,7 @@ describe Hadooken::Consumer::Callbacks do
         it 'runs the callback after running consumer action' do
           expect_any_instance_of(CallbackTestConsumer).to receive(:run_with_test_10)
 
-          CallbackTestConsumer.consume({}, { name: 'test_2' })
+          CallbackTestConsumer.consume({}, { name: 'test_2' }, 'test')
         end
       end
     end

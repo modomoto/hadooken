@@ -23,7 +23,7 @@ module Hadooken
       end
 
       def meta(computed_message_name)
-        { version: version, name: computed_message_name, time: time }
+        { version: version, name: computed_message_name, uuid: SecureRandom.uuid, time: time }
       end
 
       def partition_key
