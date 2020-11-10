@@ -31,11 +31,11 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.required_ruby_version = "~> 2.2"
-  spec.add_dependency "ruby-kafka", "~> 0.7.9"
+  spec.add_dependency "ruby-kafka", "~> 1.3.0"
   spec.add_dependency "concurrent-ruby", "~> 1.0"
   spec.add_dependency "activesupport"
   spec.add_dependency "json-schema"
-  spec.add_development_dependency "bundler", "~> 2.0.1"
+  spec.add_development_dependency "bundler", "~> 2.1.4"
   spec.add_development_dependency "rake", "~> 10.0"
   spec.add_development_dependency "rspec", "~> 3.0"
   spec.add_development_dependency "pry"
